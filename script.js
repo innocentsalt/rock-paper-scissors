@@ -48,34 +48,64 @@ function playRound(playerSelection, computerSelection) {
 function logResult(winner, playerSelection, computerSelection) {
     playerSelection = playerSelection[0].toUpperCase() + playerSelection.slice(1).toLowerCase();
     if (winner === 1) {
-        console.log(`You Win! ${playerSelection} beats ${computerSelection}`);
+        return `You Win! ${playerSelection} beats ${computerSelection}`;
     } else if (winner === -1) {
-        console.log(`You Lose! ${computerSelection} beats ${playerSelection}`);
+        return `You Lose! ${computerSelection} beats ${playerSelection}`;
     } else {
-        console.log('Tie!');
+        return 'Tie!';
     }
 }
 
-function game(numOfRounds=5) {
-    let playerScore = 0;
-    let computerScore = 0;
-    for (let i = 0; i < numOfRounds; i++) {
-        let playerSelection = window.prompt('Rock | Paper | Scissors', 'Rock');
-        let computerSelection = computerPlay();
-        let roundResult = playRound(playerSelection, computerSelection);
-        if (roundResult === 1) {
-            playerScore++;
-        } else if (roundResult === -1) {
-            computerScore++;
-        }
-        logResult(roundResult, playerSelection, computerSelection);
-    }
+function game() {
+    let roundsLeft = 5;
+    let playerScoreCount = 0;
+    let computerScoreCount = 0;
 
-    if (playerScore === computerScore) {
-        console.log('Tie!');
-    } else if (playerScore > computerScore) {
-        console.log('You Win!');
-    } else {
-        console.log('You Lose!');
-    }
+    const container = document.querySelector('#container');
+    const controls = document.querySelectorAll('#controls');
+    const message = document.querySelector('#message');
+    const playerScore = document.querySelector('#player-score');
+    const computerScore = document.querySelector('#computer-score');
+
+    controls.forEach((selection) => {
+        selection.addEventListener('click', (e) => {
+            if (roundsLeft > 0) {
+                let computerSelection = computerPlay();
+                let result = playRound(e.target.id, computerSelection);
+                console.log(result);
+                if (result === 1) {
+                    playerScoreCount++;
+                    playerScore.textContent = playerScoreCount;
+                }
+                else if (result === -1) {
+                    computerScoreCount++;
+                    computerScore.textContent = computerScoreCount;
+                }
+                message.textContent = logResult(result, e.target.id, computerSelection);
+                roundsLeft--;
+                if (roundsLeft === 0) {
+                    if (playerScoreCount > computerScoreCount) message.textContent = 'You Win!';
+                    else if (computerScoreCount > playerScoreCount) message.textContent = 'Computer Wins!'
+                    else message.textContent = 'Tie!';
+                    const restart = document.createElement('button');
+                    restart.textContent = 'Restart';
+                    container.appendChild(restart);
+                    restart.addEventListener('click', () => {
+                        /** reset game stat */
+                        roundsLeft = 5;
+                        playerScoreCount = 0;
+                        computerScoreCount = 0;
+                        /** reset dom */
+                        playerScore.textContent = 0;
+                        computerScore.textContent = 0;
+                        message.textContent ='';
+                        /** delete the restart button itself */
+                        container.removeChild(restart);
+                    });
+                }
+            }
+        });
+    });
 }
+
+game();
